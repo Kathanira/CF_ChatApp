@@ -18,7 +18,8 @@ import React from 'react';
        messages: [
          {
            _id: 1,
-           text: `Hi ${name}, how are you today?`,
+           //text: `Hi ${name}, how are you today?`,
+           text: `Hello developer`,
            createdAt: new Date(),
            user: {
              _id: 2,
