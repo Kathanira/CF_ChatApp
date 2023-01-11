@@ -1,22 +1,43 @@
 import React from 'react';
- import { StyleSheet, View, Platform, KeyboardAvoidingView } from 'react-native';
- import { GiftedChat, Bubble } from 'react-native-gifted-chat';
+import { StyleSheet, View, Platform, KeyboardAvoidingView } from 'react-native';
+import { GiftedChat, Bubble } from 'react-native-gifted-chat';
 
- export default class Chat extends React.Component {
-   constructor() {
-     super();
-     this.state = {
-       messages: [],
-     };
-   }
+const firebase = require('firebase');
+require('firebase/firestore');
 
-   componentDidMount() {
-     // Set the name property to be included in the navigation bar
+export default class Chat extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      messages: [],
+      uid: 0,
+      user: {
+        _id: "",
+        name: "",
+        avatar: "",
+      },
+   };
+   if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBdrsylz9qIQ-25A9Mo2T09YT1ZinIqUc8",
+      authDomain: "test-30fd8.firebaseapp.com",
+      projectId: "test-30fd8",
+      storageBucket: "test-30fd8.appspot.com",
+      messagingSenderId: "488564506772",
+      appId: "1:488564506772:web:db8dc481c09639193a3481",
+    });
+  }
+
+  this.referenceChatMessages = firebase.firestore().collection("messages");
+}
+
+componentDidMount() {
+  // Set the name property to be included in the navigation bar
      let name = this.props.route.params.name;
 
      this.setState({
        messages: [
-         {
+        /* {
            _id: 1,
            //text: `Hi ${name}, how are you today?`,
            text: `Hello developer`,
@@ -32,19 +53,87 @@ import React from 'react';
            text: `${name} has entered the chat`,
            createdAt: new Date(),
            system: true,
-         },
+         },*/
        ],
      });
 
      this.props.navigation.setOptions({ title: name });
+
+     this.referenceChatMessages = firebase.firestore().collection('messages');
+     this.unsubscribe = this.referenceChatMessages.onSnapshot(
+       this.onCollectionUpdate
+     );
+
+     this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+       if (!user) {
+         firebase.auth().signInAnonymously();
+       }
+       this.setState({
+         uid: user.uid,
+         messages: [],
+         user: {
+           _id: user.uid,
+           name: name,
+         },
+       });
+
+       this.unsubscribe = this.referenceChatMessages
+         .orderBy('createdAt', 'desc')
+         .onSnapshot(this.onCollectionUpdate);
+     });
    }
+
+   componentWillUnmount() {
+    this.unsubscribe();
+    this.authUnsubscribe();
+  }
 
    onSend(messages = []) {
-     this.setState((previousState) => ({
-       messages: GiftedChat.append(previousState.messages, messages),
-     }));
-   }
+    this.setState(
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }),
+      () => {
+        this.addMessage();
+      }
+    );
+  }
 
+  addMessage = () => {
+    const message = this.state.messages[0];
+    this.referenceChatMessages.add({
+      uid: this.state.uid,
+      _id: message._id,
+      text: message.text || '',
+      createdAt: message.createdAt,
+      user: message.user,
+    });
+  };
+
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    // go through each document
+    querySnapshot.forEach((doc) => {
+      // get the QueryDocumentSnapshot's data
+      let data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text,
+        createdAt: data.createdAt.toDate(),
+        user: {
+          _id: data.user._id,
+          name: data.user.name,
+          avatar: data.user.avatar || '',
+        },
+      });
+    });
+    this.setState({
+      messages,
+    });
+  };
+
+
+//Bubble customization
    renderBubble(props) {
      return (
        <Bubble
@@ -61,6 +150,7 @@ import React from 'react';
      );
    }
 
+
    render() {
      // Set the color property as background color for the chat screen
      let color = this.props.route.params.color;
@@ -71,7 +161,8 @@ import React from 'react';
            messages={this.state.messages}
            onSend={(messages) => this.onSend(messages)}
            user={{
-             _id: 1,
+             _id: this.state.uid,
+             avatar: 'https://placeimg.com/140/140/any',
            }}
          />
          {Platform.OS === 'android' ? (
