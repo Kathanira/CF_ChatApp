@@ -192,8 +192,8 @@ componentDidMount() {
        <View style={[styles.container, { backgroundColor: color }]}>
          <GiftedChat
            renderBubble={this.renderBubble.bind(this)}
-           renderInputToolbar={this.renderInputToolbar.bind(this)}
            messages={this.state.messages}
+           renderInputToolbar={this.renderInputToolbar.bind(this)}
            onSend={(messages) => this.onSend(messages)}
            user={{
              _id: this.state.uid,
