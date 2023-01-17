@@ -1,6 +1,7 @@
 # Chat App
-<img src="../assets/Screenshot1.png" alt="Screenshot Start" title="Screenshot Start">
-<img src="../assets/Screenshot2.png" alt="Screenshot Chat" title="Screenshot Chat">
+
+![Screenshot1](/assets/Screenshot1.png?raw=true)
+![Screenshot2](/assets/Screenshot2.png?raw=true)
 
  ## Intro
 
