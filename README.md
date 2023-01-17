@@ -1,8 +1,5 @@
 # Chat App
 
-![Screenshot1](/assets/Screenshot1.png?raw=true)
-![Screenshot2](/assets/Screenshot2.png?raw=true)
-
  ## Intro
 
  Chat App for both Android/iOS created with React Native. The app provides users with a chat interface and options to share images and their location.
@@ -65,3 +62,9 @@
  - Follow expo CLI's instructions depending on your preferred simulator (XCode, Android Studio, Expo Go)
  - Start the project: `npm start` or `expo start`
  - In case Expo cannot detect the running project, try running it with `npx expo start --tunnel`
+
+
+## Screenshots
+
+![Screenshot1](/assets/Screenshot1.png?raw=true)
+![Screenshot2](/assets/Screenshot2.png?raw=true)
